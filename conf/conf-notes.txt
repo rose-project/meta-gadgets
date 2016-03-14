@@ -1,0 +1,13 @@
+Common targets are:
+
+Gadget Images:
+    kodi-mediacenter
+
+Rose Images:
+    rose-image-minimal
+    rose-image-gfx
+    rose-image-multimedia
+
+For SDK:
+ bitbake rose-image-sdk -c populate_sdk
+
