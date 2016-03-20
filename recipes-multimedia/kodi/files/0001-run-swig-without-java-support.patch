@@ -1,0 +1,25 @@
+From 98db1d4b658f99121e150ee6e4d53365018eb748 Mon Sep 17 00:00:00 2001
+From: Christian Fries <christian.fries123@gmail.com>
+Date: Sun, 20 Mar 2016 12:11:09 +0100
+Subject: [PATCH] run swig without java support
+
+---
+ xbmc/interfaces/swig/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xbmc/interfaces/swig/CMakeLists.txt b/xbmc/interfaces/swig/CMakeLists.txt
+index a87f359..041b1a4 100644
+--- a/xbmc/interfaces/swig/CMakeLists.txt
++++ b/xbmc/interfaces/swig/CMakeLists.txt
+@@ -20,7 +20,7 @@ macro(generate_file file)
+   list(APPEND SOURCES ${file}.cpp)
+ endmacro()
+ 
+-find_package(Java COMPONENTS Runtime REQUIRED)
++#find_package(Java COMPONENTS Runtime REQUIRED)
+ find_package(SWIG REQUIRED)
+ find_package(Doxygen)
+ if(DOXYGEN_FOUND)
+-- 
+1.9.1
+

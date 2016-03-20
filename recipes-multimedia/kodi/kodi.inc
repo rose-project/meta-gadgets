@@ -6,33 +6,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.GPL;md5=930e2a5f63425d8dd72dbd7391c43c46"
 
 DEPENDS = " \
 	alsa-lib \
-	python \
-	python-distutils \
-	python-textutils \
-	python-sqlite3 \
-	python-pickle \
-	python-logging \
-	python-curses \
-	python-compile \
-	python-compiler \
-	python-fcntl \
-	python-shell \
-	python-multiprocessing \
-	python-subprocess \
-	python-xmlrpc \
-	python-netclient \
-	python-netserver \
-	python-unixadmin \
-	python-compression \
-	python-json \
-	python-unittest \
-	python-mmap \
-	python-difflib \
-	python-pprint \
-	python-git \
-	python-pkgutil \
-	python-pycairo \
-	python-mako \
 	mpeg2dec \
 	boost \
 	cmake \
@@ -54,13 +27,20 @@ DEPENDS = " \
 	wayland \
 	virtual/libgles2 \
 	virtual/egl \
+	mariadb \
+	libass \
+	libdcadec \
+	libcrossguid \
+	libtinyxml \
+	yajl \
+	gettext \
+	samba \
   "
 # todo: libbluray
 
 # libfslvpuwrap
 # python-elementtree
 # libass
-# mariadb
 # libmodplug
 # yajl
 # libtinyxml
@@ -77,73 +57,33 @@ DEPENDS = " \
 # libcec
 
 INC_PR = "r1"
-SRC_URI = "git://github.com/xbmc/xbmc.git;branch=${BRANCH}"
+SRC_URI = "git://github.com/xbmc/xbmc.git;branch=${BRANCH} \
+           file://0001-use-pkginfo.patch \
+					 file://0001-dont-do-static-detection.patch \
+					 file://0001-ass_crosscompile.patch \
+					 file://0001-run-swig-without-java-support.patch \
+					 file://0001-smbclient-dont-use-host-system.patch \
+					 file://0001-dont-seek-intl.patch \
+					 "
 
 S = "${WORKDIR}/git/"
 
-inherit autotools lib_package pkgconfig gettext python-dir
-
-EXTRA_OECONF=" --disable-debug \
-	--build=${BUILD_SYS} \
-	--host=${HOST_SYS} \
-	--target=${TARGET_SYS} \
-	--prefix=${D}/opt/kodi \
-	--disable-pulse \
-	--disable-projectm \
-	--disable-x11 \
-	--disable-libcec \
-	--disable-gl \
-	--disable-vdpau \
-	--disable-vaapi \
-	--disable-openmax \
-	--enable-wayland \
-	--enable-gles \
-	--enable-udev \
-	--disable-texturepacker \
-	--disable-airplay \
-	--disable-airtunes \
-	--enable-optimizations \
-	--enable-avahi \
-	--disable-mid \
-	--enable-rsxs \
-	--disable-libcec \
-	LIBS=' -llzma '"
-
-CXXFLAGS += " -I${STAGING_KERNEL_DIR}/include/uapi -I${STAGING_KERNEL_DIR}/include "
-CFLAGS += " -I${STAGING_KERNEL_DIR}/include/uapi -I${STAGING_KERNEL_DIR}/include "
+inherit pkgconfig gettext cmake
 
 FILES_${PN} += "/usr/share/icons/hicolor"
 
-EXTRA_OEMAKE = "'BUILDDIR=${S}/build'"
-
-do_configure_prepend () {
-	export TINYXML_CFLAGS="-I/${STAGING_INCDIR}"
-	export TINYXML_LIBS="-L${STAGING_LIBDIR} -ltinyxml"
-	export SQUISH_CFLAGS="-I/${STAGING_INCDIR}"
-	export SQUISH_LIBS="-L${STAGING_LIBDIR} -lsquish"
-	export PYTHON_EXTRA_LDFLAGS=""
-	export PYTHON_EXTRA_LIBS="-lz"
-	export PYTHON_VERSION="${PYTHON_BASEVERSION}"
-	export PYTHON_NOVERSIONCHECK="no-check"
-	export PYTHON_CPPFLAGS="-I/${STAGING_INCDIR}/${PYTHON_DIR}"
-	export PYTHON_LDFLAGS="-L${STAGING_LIBDIR} -lpython${PYTHON_BASEVERSION}"
-
-  cd ${S}
-	./bootstrap
-}
-
-do_compile() {
-   cd ${S}
-   make BUILDDIR=${BUILDDIR} DESTDIR=${D}
-}
-
-do_install() {
-   cd ${S}
-	 install -d ${D}
-   make BUILDDIR=${BUILDDIR} DESTDIR=${D} install
-}
-
-INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
-INHIBIT_PACKAGE_STRIP = "1"
-
-PACKAGES = "${PN}"
+OECMAKE_SOURCEPATH = "${S}/project/cmake/"
+EXTRA_OECMAKE = " \
+  -DDEPENDS_PATH=${STAGING_DIR_TARGET}/usr \
+	-DNATIVEPREFIX=${STAGING_DIR_NATIVE} \
+	-DENABLE_VAAPI=OFF \
+	-DENABLE_VDPAU=OFF \
+	-DENABLE_OPTICAL=OFF \
+	-DENABLE_X11=OFF \
+	-DENABLE_CEC=OFF \
+	-DENABLE_AIRTUNES=OFF \
+	-DENABLE_PLIST=OFF \
+	-DENABLE_BLURAY=OFF \
+	-DENABLE_MICROHTTPD=OFF \
+	-DENABLE_DVDCSS=OFF \
+	"
