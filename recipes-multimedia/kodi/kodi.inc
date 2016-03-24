@@ -11,7 +11,7 @@ DEPENDS = " \
 	cmake \
 	zlib \
 	dbus \
-  swig \
+   swig \
 	taglib \
 	tiff \
 	swig-native \
@@ -23,7 +23,7 @@ DEPENDS = " \
 	lzo \
 	avahi \
 	cairo pango fontconfig freetype \
-  libsquish \
+   libsquish \
 	wayland \
 	virtual/libgles2 \
 	virtual/egl \
@@ -35,35 +35,18 @@ DEPENDS = " \
 	yajl \
 	gettext \
 	samba \
+	libdvdread \
+	virtual/java-native \
   "
-# todo: libbluray
-
-# libfslvpuwrap
-# python-elementtree
-# libass
-# libmodplug
-# yajl
-# libtinyxml
-# libtinyxml-native
-# libcdio
-# jasper
-# libssh
-# samba
-# libmicrohttpd
-# rtmpdump
-# libplist
-# shairplay
-# ffmpeg-kodi
-# libcec
 
 INC_PR = "r1"
 SRC_URI = "git://github.com/xbmc/xbmc.git;branch=${BRANCH} \
            file://0001-use-pkginfo.patch \
 					 file://0001-dont-do-static-detection.patch \
 					 file://0001-ass_crosscompile.patch \
-					 file://0001-run-swig-without-java-support.patch \
 					 file://0001-smbclient-dont-use-host-system.patch \
 					 file://0001-dont-seek-intl.patch \
+					 file://0001-add-compiler-flag-pthread-dont-request-git-version.patch \
 					 "
 
 S = "${WORKDIR}/git/"
@@ -74,7 +57,11 @@ FILES_${PN} += "/usr/share/icons/hicolor"
 
 OECMAKE_SOURCEPATH = "${S}/project/cmake/"
 EXTRA_OECMAKE = " \
-  -DDEPENDS_PATH=${STAGING_DIR_TARGET}/usr \
+   -DVERBOSE=OFF \
+   -DPLATFORM=raspberry-pi \
+   -DCORE_SYSTEM_NAME=rbpi \
+   -DCPU=cortex-a7 \
+   -DDEPENDS_PATH=${STAGING_DIR_TARGET}/usr \
 	-DNATIVEPREFIX=${STAGING_DIR_NATIVE} \
 	-DENABLE_VAAPI=OFF \
 	-DENABLE_VDPAU=OFF \

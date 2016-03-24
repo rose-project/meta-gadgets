@@ -1,0 +1,40 @@
+From 631196ced4594ac99ba132fb07d73712e413d111 Mon Sep 17 00:00:00 2001
+From: Christian Fries <christian.fries123@gmail.com>
+Date: Thu, 24 Mar 2016 18:00:59 +0100
+Subject: [PATCH] add compiler flag -pthread, dont request git version
+
+---
+ project/cmake/CMakeLists.txt | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/project/cmake/CMakeLists.txt b/project/cmake/CMakeLists.txt
+index f96f3fe..2144180 100644
+--- a/project/cmake/CMakeLists.txt
++++ b/project/cmake/CMakeLists.txt
+@@ -6,6 +6,9 @@ if(DEPENDS_DIR)
+   list(APPEND CMAKE_PREFIX_PATH ${DEPENDS_DIR})
+ endif()
+ 
++SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
++SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
++
+ set(CMAKE_CXX_STANDARD 11)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+@@ -66,7 +69,7 @@ include(scripts/common/projectmacros.cmake)
+ include(scripts/common/pathsetup.cmake)
+ include(ExternalProject)
+ 
+-core_find_git_rev()
++#core_find_git_rev()
+ core_find_versions()
+ 
+ set(INCLUDES ${CORE_SOURCE_DIR}
+@@ -371,4 +374,3 @@ if(VERBOSE)
+   message(STATUS "CMAKE_DL_LIBS: ${CMAKE_DL_LIBS}")
+ endif()
+ message(STATUS "#-----------------------#")
+-
+-- 
+1.9.1
+
