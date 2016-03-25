@@ -40,6 +40,7 @@ DEPENDS = " \
    ffmpeg-kodi \
 	libcdio \
    kodi-native \
+   libmicrohttpd \
   "
 
 INC_PR = "r1"
@@ -71,7 +72,7 @@ EXTRA_OECMAKE = " \
 	-DENABLE_AIRTUNES=OFF \
 	-DENABLE_PLIST=OFF \
 	-DENABLE_BLURAY=OFF \
-	-DENABLE_MICROHTTPD=OFF \
+	-DENABLE_MICROHTTPD=ON \
 	-DENABLE_DVDCSS=OFF \
    -DENABLE_INTERNAL_FFMPEG=OFF \
 	"
