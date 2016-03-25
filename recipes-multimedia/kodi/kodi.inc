@@ -37,6 +37,7 @@ DEPENDS = " \
 	samba \
 	libdvdread \
 	virtual/java-native \
+   ffmpeg-kodi \
   "
 
 INC_PR = "r1"
@@ -73,4 +74,6 @@ EXTRA_OECMAKE = " \
 	-DENABLE_BLURAY=OFF \
 	-DENABLE_MICROHTTPD=OFF \
 	-DENABLE_DVDCSS=OFF \
+   -DENABLE_INTERNAL_FFMPEG=OFF \
 	"
+
