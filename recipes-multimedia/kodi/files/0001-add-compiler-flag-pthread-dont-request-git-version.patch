@@ -17,7 +17,7 @@ index f96f3fe..2144180 100644
  
 +SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 +SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-+
++include_directories(${DEPENDS_PATH}/include/interface/vcos/pthreads ${DEPENDS_PATH}/include/interface/vmcs_host/linux)
  set(CMAKE_CXX_STANDARD 11)
  set(CMAKE_CXX_STANDARD_REQUIRED ON)
  set(CMAKE_CXX_EXTENSIONS OFF)
