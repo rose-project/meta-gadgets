@@ -42,12 +42,9 @@ DEPENDS = " \
 
 INC_PR = "r1"
 SRC_URI = "git://github.com/xbmc/xbmc.git;branch=${BRANCH} \
-           file://0001-use-pkginfo.patch \
-					 file://0001-dont-do-static-detection.patch \
-					 file://0001-ass_crosscompile.patch \
-					 file://0001-smbclient-dont-use-host-system.patch \
-					 file://0001-dont-seek-intl.patch \
 					 file://0001-add-compiler-flag-pthread-dont-request-git-version.patch \
+					 file://0001-dont-search-dependency-ffmpeg-on-external-build.patch \
+					 file://0001-fix-library-and-include-search-paths.patch \
 					 "
 
 S = "${WORKDIR}/git/"
@@ -76,4 +73,6 @@ EXTRA_OECMAKE = " \
 	-DENABLE_DVDCSS=OFF \
    -DENABLE_INTERNAL_FFMPEG=OFF \
 	"
+
+#ENABLE_INTERNAL_CROSSGUID=OFF
 

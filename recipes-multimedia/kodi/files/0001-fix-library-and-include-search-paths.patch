@@ -1,0 +1,356 @@
+From e122e91c93350ef422160111c35d824431def20d Mon Sep 17 00:00:00 2001
+From: Christian Fries <christian.fries123@gmail.com>
+Date: Fri, 25 Mar 2016 22:46:29 +0100
+Subject: [PATCH] fix library and include search paths
+
+---
+ project/cmake/modules/FindASS.cmake          |  7 ++++++-
+ project/cmake/modules/FindAlsa.cmake         |  2 ++
+ project/cmake/modules/FindAvahi.cmake        |  1 +
+ project/cmake/modules/FindCurl.cmake         | 24 +++++++++++++++---------
+ project/cmake/modules/FindDbus.cmake         |  6 +++---
+ project/cmake/modules/FindEGL.cmake          |  9 +++++----
+ project/cmake/modules/FindFFMPEG.cmake       | 14 ++++++++------
+ project/cmake/modules/FindFreeType.cmake     |  4 +++-
+ project/cmake/modules/FindFribidi.cmake      |  4 +++-
+ project/cmake/modules/FindLibSmbClient.cmake | 10 ++--------
+ project/cmake/modules/FindLzo2.cmake         | 11 ++++++++++-
+ project/cmake/modules/FindMMAL.cmake         |  2 ++
+ project/cmake/modules/FindPython.cmake       |  2 +-
+ project/cmake/modules/FindSqlite3.cmake      |  1 +
+ project/cmake/modules/FindUDev.cmake         |  1 +
+ project/cmake/modules/FindXslt.cmake         |  7 ++++---
+ project/cmake/modules/FindYajl.cmake         |  4 ++--
+ 17 files changed, 69 insertions(+), 40 deletions(-)
+
+diff --git a/project/cmake/modules/FindASS.cmake b/project/cmake/modules/FindASS.cmake
+index 5f4b0c7..6f2a8f2 100644
+--- a/project/cmake/modules/FindASS.cmake
++++ b/project/cmake/modules/FindASS.cmake
+@@ -6,7 +6,12 @@
+ # ASS_LIBRARIES - The libass libraries
+ 
+ if(PKG_CONFIG_FOUND)
+-  pkg_check_modules (ASS libass)
++  pkg_check_modules (PC_ASS libass)
++  find_path(ASS_INCLUDE_DIRS ass.h
++                              PATH_SUFFIXES ass
++                              PATHS ${PC_ASS_INCLUDEDIR})
++  find_library(ASS_LIBRARIES NAMES ass libass
++                              PATHS ${PC_ASS_LIBDIR})
+ else()
+   find_path(ASS_INCLUDE_DIRS ass/ass.h)
+   find_library(ASS_LIBRARIES NAMES ass libass)
+diff --git a/project/cmake/modules/FindAlsa.cmake b/project/cmake/modules/FindAlsa.cmake
+index b15a0cf..b3d358e 100644
+--- a/project/cmake/modules/FindAlsa.cmake
++++ b/project/cmake/modules/FindAlsa.cmake
+@@ -7,6 +7,8 @@
+ 
+ if(PKG_CONFIG_FOUND)
+   pkg_check_modules (ALSA alsa)
++  find_path(ALSA_INCLUDE_DIRS asoundlib.h PATH_SUFFIXES alsa PATHS ${ALSA_INCLUDEDIR})
++  find_library(ALSA_LIBRARIES asound PATHS ${ALSA_PC_ASS_LIBDIR})
+ else()
+   find_path(ALSA_INCLUDE_DIRS asoundlib.h PATH_SUFFIXES alsa)
+   find_library(ALSA_LIBRARIES asound)
+diff --git a/project/cmake/modules/FindAvahi.cmake b/project/cmake/modules/FindAvahi.cmake
+index 24bf15c..28663df 100644
+--- a/project/cmake/modules/FindAvahi.cmake
++++ b/project/cmake/modules/FindAvahi.cmake
+@@ -8,6 +8,7 @@
+ if(PKG_CONFIG_FOUND)
+   pkg_check_modules (AVAHI avahi-client)
+   list(APPEND AVAHI_INCLUDE_DIRS ${AVAHI_INCLUDEDIR})
++  list(APPEND AVAHI_LIBRARIES ${AVAHI_LIBDIR})
+ else()
+   find_path(AVAHI_CLIENT_INCLUDE_DIRS avahi-client/client.h)
+   find_path(AVAHI_COMMON_INCLUDE_DIRS avahi-common/defs.h)
+diff --git a/project/cmake/modules/FindCurl.cmake b/project/cmake/modules/FindCurl.cmake
+index a2e8862..b9b43af 100644
+--- a/project/cmake/modules/FindCurl.cmake
++++ b/project/cmake/modules/FindCurl.cmake
+@@ -6,12 +6,18 @@
+ # CURL_LIBRARIES - The libcurl libraries
+ 
+ if(PKG_CONFIG_FOUND)
+-  pkg_check_modules (CURL libcurl)
+-  list(APPEND CURL_INCLUDE_DIRS ${CURL_INCLUDEDIR})
++  pkg_check_modules (PC_CURL libcurl)
++  find_path(CURL_INCLUDE_DIRS curl.h
++                              PATH_SUFFIXES curl
++                              PATHS ${PC_CURL_INCLUDEDIR})
++  find_library(CURL_LIBRARIES NAMES curl libcurl
++                              PATHS ${PC_CURL_LIBDIR})
+ else()
+-  find_path(CURL_INCLUDE_DIRS curl/curl.h)
+   find_library(CURL_LIBRARIES NAMES curl libcurl)
+ endif()
++
++
++
+ include(FindPackageHandleStandardArgs)
+ find_package_handle_standard_args(Curl DEFAULT_MSG CURL_INCLUDE_DIRS CURL_LIBRARIES)
+ 
+@@ -22,13 +28,13 @@ if(CURL_FOUND)
+     set(CURL_LIBRARY_DIRS ${CURL_LIBDIR})
+   endif()
+ 
+-  find_soname(CURL)
++#  find_soname(CURL)
+ 
+-  if(EXISTS "${CURL_LIBRARY_DIRS}/${CURL_SONAME}")
+-    execute_process(COMMAND readelf -s ${CURL_LIBRARY_DIRS}/${CURL_SONAME} COMMAND grep CRYPTO_set_locking_call OUTPUT_VARIABLE HAS_CURL_STATIC)
+-  else()
+-    message(FATAL_ERROR "curl library not found")
+-  endif()
++#  if(EXISTS "${CURL_LIBRARY_DIRS}/${CURL_SONAME}")
++#    execute_process(COMMAND readelf -s ${CURL_LIBRARY_DIRS}/${CURL_SONAME} COMMAND grep CRYPTO_set_locking_call OUTPUT_VARIABLE HAS_CURL_STATIC)
++#  else()
++#    message(FATAL_ERROR "curl library not found")
++#  endif()
+ endif()
+ 
+ if(HAS_CURL_STATIC)
+diff --git a/project/cmake/modules/FindDbus.cmake b/project/cmake/modules/FindDbus.cmake
+index cdc3f52..60b3f0d 100644
+--- a/project/cmake/modules/FindDbus.cmake
++++ b/project/cmake/modules/FindDbus.cmake
+@@ -7,9 +7,9 @@
+ 
+ if(PKG_CONFIG_FOUND)
+   pkg_check_modules (DBUS dbus-1)
+-endif()
+-
+-if(DBUS_FOUND)
++  find_path(DBUS_INCLUDE_DIRS dbus/dbus.h PATH_SUFFIXES dbus-1.0 PATHS ${DBUS_INCLUDEDIR})
++  find_library(DBUS_LIBRARIES dbus-1.0 PATHS ${DBUS_LIBDIR})
++else()
+   find_path(DBUS_INCLUDE_DIRS dbus/dbus.h PATH_SUFFIXES dbus-1.0)
+   find_library(DBUS_LIBRARIES dbus-1.0)
+ endif()
+diff --git a/project/cmake/modules/FindEGL.cmake b/project/cmake/modules/FindEGL.cmake
+index 79bb176..5b41fe0 100644
+--- a/project/cmake/modules/FindEGL.cmake
++++ b/project/cmake/modules/FindEGL.cmake
+@@ -15,16 +15,17 @@
+ #   EGL::EGL   - The EGL library
+ 
+ if(PKG_CONFIG_FOUND)
+-  pkg_check_modules(PC_EGL egl QUIET)
+-endif()
++  pkg_check_modules(PC_EGL egl)
++  set(EGL_VERSION ${PC_EGL_VERSION})
+ 
+-find_path(EGL_INCLUDE_DIR EGL/egl.h
++  find_path(EGL_INCLUDE_DIR EGL/egl.h
+                           PATHS ${PC_EGL_INCLUDEDIR})
+ 
+ find_library(EGL_LIBRARY NAMES EGL egl
+                          PATHS ${PC_EGL_LIBDIR})
++endif()
++
+ 
+-set(EGL_VERSION ${PC_EGL_VERSION})
+ 
+ include(FindPackageHandleStandardArgs)
+ find_package_handle_standard_args(EGL
+diff --git a/project/cmake/modules/FindFFMPEG.cmake b/project/cmake/modules/FindFFMPEG.cmake
+index 711845a..08eb0e4 100644
+--- a/project/cmake/modules/FindFFMPEG.cmake
++++ b/project/cmake/modules/FindFFMPEG.cmake
+@@ -68,15 +68,17 @@ fi")
+                                  -DUSE_STATIC_FFMPEG=1)
+   set(FFMPEG_FOUND 1)
+ else()
+-  if(FFMPEG_PATH)
+-    set(ENV{PKG_CONFIG_PATH} "${FFMPEG_PATH}/lib/pkgconfig")
+-  endif()
++#  if(FFMPEG_PATH)
++#    set(ENV{PKG_CONFIG_PATH} "${FFMPEG_PATH}/lib/pkgconfig")
++#  endif()
++
+   set(FFMPEG_PKGS libavcodec>=56.26.100 libavfilter>=5.11.100 libavformat>=56.25.101
+                   libavutil>=54.20.100 libswscale>=3.1.101 libswresample>=1.1.100 libpostproc>=53.3.100)
+   if(PKG_CONFIG_FOUND)
+-    pkg_check_modules (FFMPEG ${FFMPEG_PKGS})
+-    string(REGEX REPLACE "framework;" "framework " FFMPEG_LDFLAGS "${FFMPEG_LDFLAGS}")
+-    set(FFMPEG_LIBRARIES ${FFMPEG_LDFLAGS})
++    pkg_check_modules (PC_FFMPEG libavcodec)
++#    string(REGEX REPLACE "framework;" "framework " FFMPEG_LDFLAGS "${FFMPEG_LDFLAGS}")
++    set(FFMPEG_LIBRARIES ${PC_FFMPEG_LIBDIR})
++	 find_path(FFMPEG_INCLUDE_DIRS libavcodec/avcodec.h PATH_SUFFIXES ffmpeg PATHS ${PC_FFMPEG_INCLUDEDIR})
+   else()
+     find_path(FFMPEG_INCLUDE_DIRS libavcodec/avcodec.h PATH_SUFFIXES ffmpeg)
+     find_library(FFMPEG_LIBAVCODEC NAMES avcodec libavcodec PATH_SUFFIXES ffmpeg/libavcodec)
+diff --git a/project/cmake/modules/FindFreeType.cmake b/project/cmake/modules/FindFreeType.cmake
+index a1e69ab..8f7c952 100644
+--- a/project/cmake/modules/FindFreeType.cmake
++++ b/project/cmake/modules/FindFreeType.cmake
+@@ -6,7 +6,9 @@
+ # FREETYPE_LIBRARIES - The freetype libraries
+ 
+ if(PKG_CONFIG_FOUND)
+-  pkg_check_modules (FREETYPE freetype2)
++  pkg_check_modules (PC_FREETYPE freetype2)
++  find_path(FREETYPE_INCLUDE_DIRS freetype2/freetype/freetype.h PATHS ${PC_FREETYPE_INCLUDEDIR})
++  find_library(FREETYPE_LIBRARIES NAMES freetype freetype246MT PATHS ${PC_FREETYPE_LIBDIR})
+ else()
+   find_path(FREETYPE_INCLUDE_DIRS freetype/freetype.h)
+   find_library(FREETYPE_LIBRARIES NAMES freetype freetype246MT)
+diff --git a/project/cmake/modules/FindFribidi.cmake b/project/cmake/modules/FindFribidi.cmake
+index 65a8d8b..ec6c3fd 100644
+--- a/project/cmake/modules/FindFribidi.cmake
++++ b/project/cmake/modules/FindFribidi.cmake
+@@ -6,7 +6,9 @@
+ # FRIBIDI_LIBRARIES - The fribidi libraries
+ 
+ if(PKG_CONFIG_FOUND)
+-  pkg_check_modules (FRIBIDI fribidi)
++  pkg_check_modules (PC_FRIBIDI fribidi)
++  find_path(FRIBIDI_INCLUDE_DIRS fribidi/fribidi.h PATHS ${PC_FRIBIDI_INCLUDEDIR})
++  find_library(FRIBIDI_LIBRARIES NAMES fribidi libfribidi PATHS ${PC_FRIBIDI_LIBDIR})
+ else()
+   find_path(FRIBIDI_INCLUDE_DIRS fribidi/fribidi.h)
+   find_library(FRIBIDI_LIBRARIES NAMES fribidi libfribidi)
+diff --git a/project/cmake/modules/FindLibSmbClient.cmake b/project/cmake/modules/FindLibSmbClient.cmake
+index 897fa7b..d6f0c5c 100644
+--- a/project/cmake/modules/FindLibSmbClient.cmake
++++ b/project/cmake/modules/FindLibSmbClient.cmake
+@@ -13,20 +13,14 @@ else (LIBSMBCLIENT_LIBRARIES AND LIBSMBCLIENT_INCLUDE_DIRS)
+     NAMES
+       libsmbclient.h
+     PATHS
+-      /usr/include
+-      /usr/local/include
+-      /opt/local/include
+-      /sw/include
++      ${LIBSMBCLIENT_INCLUDEDIR}
+   )
+ 
+   find_library(SMBCLIENT_LIBRARY
+     NAMES
+       smbclient
+     PATHS
+-      /usr/lib
+-      /usr/local/lib
+-      /opt/local/lib
+-      /sw/lib
++      ${LIBSMBCLIENT_LIBDIR}
+   )
+ 
+   if (SMBCLIENT_LIBRARY)
+diff --git a/project/cmake/modules/FindLzo2.cmake b/project/cmake/modules/FindLzo2.cmake
+index 33eee10..82d5f5b 100644
+--- a/project/cmake/modules/FindLzo2.cmake
++++ b/project/cmake/modules/FindLzo2.cmake
+@@ -11,11 +11,20 @@
+ # Redistribution and use is allowed according to the terms of the BSD license.
+ # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+ 
+-
++if(PKG_CONFIG_FOUND)
++  pkg_check_modules(PC_LZO2 lzo2)
++  find_path(LZO2_INCLUDE_DIRS lzo/lzo1x.h
++                               PATHS ${PC_LZO2_INCLUDEDIR})
++  find_library(LZO2_LIBRARIES NAMES lzo2 liblzo2
++                              PATHS ${PC_LZO2_LIBDIR})
++else()
+ FIND_PATH(LZO2_INCLUDE_DIRS lzo1x.h PATH_SUFFIXES lzo)
+ 
+ FIND_LIBRARY(LZO2_LIBRARIES NAMES lzo2 liblzo2)
+ 
++endif()
++
++
+ include(FindPackageHandleStandardArgs)
+ find_package_handle_standard_args(Lzo2 DEFAULT_MSG LZO2_INCLUDE_DIRS LZO2_LIBRARIES)
+ 
+diff --git a/project/cmake/modules/FindMMAL.cmake b/project/cmake/modules/FindMMAL.cmake
+index 8843983..4db83b6 100644
+--- a/project/cmake/modules/FindMMAL.cmake
++++ b/project/cmake/modules/FindMMAL.cmake
+@@ -7,6 +7,8 @@
+ 
+ if(PKG_CONFIG_FOUND)
+   pkg_check_modules(MMAL mmal QUIET)
++  find_path(MMAL_INCLUDE_DIRS interface/mmal/mmal.h PATHS ${MMAL_INCLUDEDIR})
++  find_library(MMAL_LIBRARY  mmal PATHS ${MMAL_LIBDIR})
+ endif()
+ 
+ if(NOT MMAL_FOUND)
+diff --git a/project/cmake/modules/FindPython.cmake b/project/cmake/modules/FindPython.cmake
+index 6f9f236..93cb12d 100644
+--- a/project/cmake/modules/FindPython.cmake
++++ b/project/cmake/modules/FindPython.cmake
+@@ -18,7 +18,7 @@ if(NOT PYTHON_FOUND)
+ 
+     find_library(FFI_LIBRARY ffi)
+     find_library(EXPAT_LIBRARY expat)
+-    find_library(INTL_LIBRARY intl)
++    #find_library(INTL_LIBRARY intl)
+ 
+     if(NOT CORE_SYSTEM_NAME STREQUAL android)
+         set(PYTHON_DEP_LIBRARIES -lpthread -ldl -lutil)
+diff --git a/project/cmake/modules/FindSqlite3.cmake b/project/cmake/modules/FindSqlite3.cmake
+index a47944e..eeb1b41 100644
+--- a/project/cmake/modules/FindSqlite3.cmake
++++ b/project/cmake/modules/FindSqlite3.cmake
+@@ -8,6 +8,7 @@
+ if(PKG_CONFIG_FOUND)
+   pkg_check_modules (SQLITE3 sqlite3)
+   list(APPEND SQLITE3_INCLUDE_DIRS ${SQLITE3_INCLUDEDIR})
++  list(APPEND SQLITE3_LIBRARIES ${SQLITE3_LIBDIR})
+ else()
+   find_path(SQLITE3_INCLUDE_DIRS sqlite3.h)
+   find_library(SQLITE3_LIBRARIES sqlite3)
+diff --git a/project/cmake/modules/FindUDev.cmake b/project/cmake/modules/FindUDev.cmake
+index 97fa956..d5bd33c 100644
+--- a/project/cmake/modules/FindUDev.cmake
++++ b/project/cmake/modules/FindUDev.cmake
+@@ -8,6 +8,7 @@
+ if(PKG_CONFIG_FOUND)
+   pkg_check_modules (UDEV libudev)
+   list(APPEND UDEV_INCLUDE_DIRS ${UDEV_INCLUDEDIR})
++  list(APPEND UDEV_LIBRARIES ${UDEV_LIBDIR})
+ endif()
+ 
+ if(NOT UDEV_FOUND)
+diff --git a/project/cmake/modules/FindXslt.cmake b/project/cmake/modules/FindXslt.cmake
+index 442ba43..4c119aa 100644
+--- a/project/cmake/modules/FindXslt.cmake
++++ b/project/cmake/modules/FindXslt.cmake
+@@ -7,11 +7,12 @@
+ 
+ if(PKG_CONFIG_FOUND)
+   pkg_check_modules (XSLT libxslt)
+-else()
+-  find_path(XSLT_INCLUDE_DIRS libxslt/xslt.h)
+-  find_library(XSLT_LIBRARIES NAMES xslt libxslt)
+ endif()
+ 
++  find_path(XSLT_INCLUDE_DIRS libxslt/xslt.h PATHS ${XSLT_INCLUDEDIR})
++  find_library(XSLT_LIBRARIES NAMES xslt libxslt PATHS ${XSLT_LIBDIR})
++
++
+ include(FindPackageHandleStandardArgs)
+ find_package_handle_standard_args(Xslt DEFAULT_MSG XSLT_INCLUDE_DIRS XSLT_LIBRARIES)
+ 
+diff --git a/project/cmake/modules/FindYajl.cmake b/project/cmake/modules/FindYajl.cmake
+index c27b03a..768729f 100644
+--- a/project/cmake/modules/FindYajl.cmake
++++ b/project/cmake/modules/FindYajl.cmake
+@@ -8,8 +8,8 @@ if(YAJL_FOUND)
+ endif()
+ 
+ if(NOT YAJL_FOUND)
+-  find_path(YAJL_INCLUDE_DIRS yajl/yajl_common.h)
+-  find_library(YAJL_LIBRARIES NAMES yajl)
++  find_path(YAJL_INCLUDE_DIRS yajl/yajl_common.h PATHS ${YAJL_INCLUDEDIR})
++  find_library(YAJL_LIBRARIES NAMES yajl PATHS ${YAJL_LIBDIR})
+ 
+   file(STRINGS ${YAJL_INCLUDE_DIRS}/yajl/yajl_version.h version_header)
+   string(REGEX MATCH "YAJL_MAJOR ([0-9]+)" YAJL_VERSION_MAJOR ${version_header})
+-- 
+1.9.1
+
