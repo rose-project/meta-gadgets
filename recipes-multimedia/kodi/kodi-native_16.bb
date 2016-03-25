@@ -29,5 +29,5 @@ do_compile() {
 }
 
 do_install() {
-  ln -s ${STAGING_DIR_NATIVE}/${BUILD_SYS}-gnu-native/bin/JsonSchemaBuilder ${STAGING_DIR_NATIVE}/usr/bin/JsonSchemaBuilder
+  ln -s ${STAGING_DIR_NATIVE}/${BUILD_SYS}-gnu-native/bin/JsonSchemaBuilder ${STAGING_DIR_NATIVE}/bin/JsonSchemaBuilder
 }

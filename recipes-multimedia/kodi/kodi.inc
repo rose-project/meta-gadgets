@@ -38,6 +38,8 @@ DEPENDS = " \
 	libdvdread \
 	virtual/java-native \
    ffmpeg-kodi \
+	libcdio \
+   kodi-native \
   "
 
 INC_PR = "r1"
