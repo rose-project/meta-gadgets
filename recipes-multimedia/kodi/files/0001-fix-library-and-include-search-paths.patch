@@ -192,8 +192,8 @@ index a1e69ab..8f7c952 100644
  
  if(PKG_CONFIG_FOUND)
 -  pkg_check_modules (FREETYPE freetype2)
-+  pkg_check_modules (PC_FREETYPE freetype2)
-+  find_path(FREETYPE_INCLUDE_DIRS freetype2/freetype/freetype.h PATHS ${PC_FREETYPE_INCLUDEDIR})
++  pkg_check_modules (PC_FREETYPE freetype2) 
++  find_path(FREETYPE_INCLUDE_DIRS freetype/freetype.h PATH_SUFFIXES freetype2 PATHS ${PC_FREETYPE_INCLUDEDIR})
 +  find_library(FREETYPE_LIBRARIES NAMES freetype freetype246MT PATHS ${PC_FREETYPE_LIBDIR})
  else()
    find_path(FREETYPE_INCLUDE_DIRS freetype/freetype.h)

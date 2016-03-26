@@ -1,0 +1,46 @@
+From 9d803c941c0912047a0381b3196a32b3d115fa4c Mon Sep 17 00:00:00 2001
+From: Christian Fries <christian.fries123@gmail.com>
+Date: Sat, 26 Mar 2016 09:08:38 +0100
+Subject: [PATCH] add texturepacker option
+
+---
+ project/cmake/CMakeLists.txt | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/project/cmake/CMakeLists.txt b/project/cmake/CMakeLists.txt
+index f96f3fe..cc01cb9 100644
+--- a/project/cmake/CMakeLists.txt
++++ b/project/cmake/CMakeLists.txt
+@@ -24,6 +24,7 @@ option(ENABLE_PLIST       "Enable AirPlay support?" ON)
+ option(ENABLE_NFS         "Enable NFS support?" ON)
+ option(ENABLE_AIRTUNES    "Enable AirTunes support?" ON)
+ option(ENABLE_CEC         "Enable CEC support?" ON)
++option(ENABLE_TEXTUREPACKER "Enable Texture packer support?" ON)
+ if(UNIX)
+   if(NOT APPLE)
+     option(ENABLE_INTERNAL_FFMPEG "Enable internal ffmpeg?" ON)
+@@ -117,7 +118,9 @@ set(dyload_optional RTMP CEC Bluray Plist NFS)
+ set(required_dep_libs PNG EXPAT)
+ 
+ # Required tools
+-find_package(TexturePacker REQUIRED)
++if(ENABLE_TEXTUREPACKER)
++find_package(TexturePacer REQUIRED)
++endif()
+ find_package(JsonSchemaBuilder REQUIRED)
+ 
+ foreach(dep ${required_dep_libs})
+@@ -271,8 +274,10 @@ foreach(skin ${SKINS})
+   copy_skin_to_buildtree(${dir} ${relative})
+ endforeach()
+ 
++if(ENABLE_TEXTUREPACKER)
+ add_custom_target(pack-skins ALL
+                   DEPENDS TexturePacker::TexturePacker export-files ${XBT_FILES})
++endif()
+ 
+ core_link_library(exif system/libexif)
+ if(CORE_SYSTEM_NAME STREQUAL linux)
+-- 
+1.9.1
+

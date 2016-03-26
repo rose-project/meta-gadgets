@@ -1,0 +1,27 @@
+From 7811b430175e6ee9cb2996152189094e34eab2b8 Mon Sep 17 00:00:00 2001
+From: Christian Fries <christian.fries123@gmail.com>
+Date: Fri, 25 Mar 2016 18:02:03 +0100
+Subject: [PATCH] dont search dependency ffmpeg on external build
+
+---
+ xbmc/cores/omxplayer/CMakeLists.txt | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/omxplayer/CMakeLists.txt b/xbmc/cores/omxplayer/CMakeLists.txt
+index 212159e..a11b139 100644
+--- a/xbmc/cores/omxplayer/CMakeLists.txt
++++ b/xbmc/cores/omxplayer/CMakeLists.txt
+@@ -19,6 +19,8 @@ set(HEADERS OMXAudio.h
+ core_add_library(omxplayer)
+ add_definitions(-D__STDC_FORMAT_MACROS)
+ 
+-add_dependencies(omxplayer linuxsupport ffmpeg)
+-
++add_dependencies(omxplayer linuxsupport)
+ 
++if(ENABLE_INTERNAL_FFMPEG)
++  add_dependencies(omxplayer ffmpeg)
++endif()
+-- 
+1.9.1
+

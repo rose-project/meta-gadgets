@@ -1,0 +1,27 @@
+From f4cf88f16c909cc30ad534f471c78fe648008eb8 Mon Sep 17 00:00:00 2001
+From: Christian Fries <christian.fries123@gmail.com>
+Date: Sat, 26 Mar 2016 09:53:41 +0100
+Subject: [PATCH] dont generate doxygen files without doxygen
+
+---
+ xbmc/interfaces/swig/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/interfaces/swig/CMakeLists.txt b/xbmc/interfaces/swig/CMakeLists.txt
+index a87f359..f6d7e17 100644
+--- a/xbmc/interfaces/swig/CMakeLists.txt
++++ b/xbmc/interfaces/swig/CMakeLists.txt
+@@ -14,8 +14,8 @@ macro(generate_file file)
+                      COMMAND ${SWIG_EXECUTABLE}
+                      ARGS -w401 -c++ -o ${file}.xml -xml -I${CORE_SOURCE_DIR}/xbmc -xmllang python ${CMAKE_CURRENT_SOURCE_DIR}/../swig/${file}
+                      COMMAND ${Java_JAVA_EXECUTABLE}
+-                     ARGS -cp "${classpath}" groovy.ui.GroovyMain ${CORE_SOURCE_DIR}/tools/codegenerator/Generator.groovy ${file}.xml ${CMAKE_CURRENT_SOURCE_DIR}/../python/PythonSwig.cpp.template ${file}.cpp ${CMAKE_CURRENT_BINARY_DIR}/doxygenxml > ${devnull}
+-                     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${file} ${INTERFACE_FILES} ${CMAKE_CURRENT_BINARY_DIR}/.doxygen-gen
++                     ARGS -cp "${classpath}" groovy.ui.GroovyMain ${CORE_SOURCE_DIR}/tools/codegenerator/Generator.groovy ${file}.xml ${CMAKE_CURRENT_SOURCE_DIR}/../python/PythonSwig.cpp.template ${file}.cpp > ${devnull}
++                     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${file} ${INTERFACE_FILES}
+                      IMPLICIT_DEPENDS CXX ${CMAKE_CURRENT_SOURCE_DIR}/../swig/${file})
+   list(APPEND SOURCES ${file}.cpp)
+ endmacro()
+-- 
+1.9.1
+

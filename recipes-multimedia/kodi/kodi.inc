@@ -48,6 +48,8 @@ SRC_URI = "git://github.com/xbmc/xbmc.git;branch=${BRANCH} \
 					 file://0001-add-compiler-flag-pthread-dont-request-git-version.patch \
 					 file://0001-dont-search-dependency-ffmpeg-on-external-build.patch \
 					 file://0001-fix-library-and-include-search-paths.patch \
+				    file://0001-add-texturepacker-option.patch \
+				    file://0001-dont-generate-doxygen-files-without-doxygen.patch \
 					 "
 
 S = "${WORKDIR}/git/"
@@ -75,6 +77,7 @@ EXTRA_OECMAKE = " \
 	-DENABLE_MICROHTTPD=ON \
 	-DENABLE_DVDCSS=OFF \
    -DENABLE_INTERNAL_FFMPEG=OFF \
+	-DENABLE_TEXTUREPACKER=OFF \
 	"
 
 #ENABLE_INTERNAL_CROSSGUID=OFF
